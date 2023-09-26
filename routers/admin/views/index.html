@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload</title>
+  </head>
+  <body>
+    <input type="file" name="file" id="image" accept=".png" />
+    <input type="text" id="name" placeholder="name" />
+    <input type="text" id="fueltype" placeholder="fueltype" />
+    <input type="number" id="mileage" placeholder="mileage" />
+    <input type="number" id="price" placeholder="price" />
+    <input type="text" id="location" placeholder="location" />
+    <input type="number" id="size" placeholder="size" />
+    <button id="upload">Upload</button>
+
+    <br />
+
+    <input type="text" id="token" placeholder="your token" />
+
+    <img src="" id="imgh" alt="Uploaded Image" />
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const image = document.getElementById("image");
+    const name = document.getElementById("name");
+    const fueltype = document.getElementById("fueltype");
+    const mileage = document.getElementById("mileage");
+    const price = document.getElementById("price");
+    const size = document.getElementById("size");
+    const location_data = document.getElementById("location");
+    const upload = document.getElementById("upload");
+
+    const imgElement = document.getElementById("imgh");
+
+    var imgdata = undefined;
+
+    image.addEventListener("change", () => {
+      const file = image.files[0];
+      const fileReader = new FileReader();
+
+      fileReader.onload = (event) => {
+        const imageDataURL = event.target.result;
+        imgdata = imageDataURL;
+        imgElement.src = imageDataURL;
+      };
+
+      fileReader.readAsDataURL(file);
+    });
+
+    upload.addEventListener("click", () => {
+      axios
+        .post(
+          "http://localhost:5000/admin/cars/upload",
+          {
+            name: name.value,
+            fueltype: fueltype.value,
+            mileage: mileage.value,
+            amount: price.value,
+            size: size.value,
+            location: JSON.stringify(location_data.value),
+            img: imgdata,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${document.getElementById("token").value}`,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.error(err);
+          alert(err);
+        });
+    });
+  </script>
+</html>
