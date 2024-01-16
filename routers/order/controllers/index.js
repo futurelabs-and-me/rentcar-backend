@@ -30,28 +30,28 @@ module.exports = (req, res) => {
                 .sendMail({
                   from: process.env.EMAIL_SMTP_USERNAME,
                   to: adminData.email,
-                  subject: `${data_car.name} orderd`, // Subject line
-                  text: "car orderd", // plain text body
-                  html: `<p>the ${data_car.name} are orded</p>\n<p>by ${req.local.user.username}</p>\n <br><p>price ${data_order.price}</p><br><br><p>user phnoe number ${req.local.user.phone_no}</p><br><p>user email ${req.local.user.email}</p>`, // html body
+                  subject: `${data_car.name} orderd`,
+                  text: "car orderd",
+                  html: `<p>the ${data_car.name} are orded</p>\n<p>by ${req.local.user.username}</p>\n <br><p>price ${data_order.price}</p><br><br><p>user phnoe number ${req.local.user.phone_no}</p><br><p>user email ${req.local.user.email}</p>`,
                 })
                 .then(() => {
                   res.status(200);
-                  res.json({ data: data_order });
+                  res.json({ status: "success", data: data_order });
                 })
                 .catch((error) => {
                   res.status(500);
-                  res.json({ error: error.message });
+                  res.json({ status: "error", error: error.message });
                 });
             })
             .catch((error) => {
               res.status(500);
-              res.json({ error: error.message });
+              res.json({ status: "error", error: error.message });
             });
         });
       })
       .catch((error) => {
         res.status(500);
-        res.json({ error: error.message });
+        res.json({ status: "error", error: error.message });
       });
   }
 };

@@ -1,7 +1,7 @@
-const users = require("../../../Schemas/user");
 module.exports = (req, res) => {
-  users
-    .findById({ _id: req.local.user.id })
+  const { id } = req.params;
+  user
+    .deleteOne({ _id: id })
     .then((data) => {
       res.json({ data });
     })

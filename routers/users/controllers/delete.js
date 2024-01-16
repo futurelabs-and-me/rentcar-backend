@@ -1,10 +1,10 @@
 const user = require("../../../Schemas/user");
 module.exports = (req, res) => {
   user
-    .findByIdAndDelete(req.locals.user.id)
+    .findByIdAndDelete(req.local.user.id)
     .then((data) => {
       res.status(200);
-      res.json({ message: "car deleted successfully", data });
+      res.json({ message: "user deleted successfully", data });
     })
     .catch((error) => {
       res.status(500);

@@ -1,7 +1,7 @@
 const user = require("../../../Schemas/user");
 module.exports = (req, res) => {
   user
-    .findByIdAndUpdate(req.locals.user.id, req.body)
+    .findByIdAndUpdate(req.local.user.id, req.body)
     .then((data) => {
       res.status(200);
       res.json({ message: "user updated successfully", data });

@@ -1,12 +1,8 @@
 const JWT = require("jsonwebtoken");
 const user = require("../../Schemas/user");
 module.exports = (req, res, next) => {
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    const token = req.headers.authorization.split(" ")[1];
-    JWT.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+  if (req.cookies.Token && req.cookies.user) {
+    JWT.verify(req.cookies?.Token, process.env.SECRET_KEY, (err, decoded) => {
       if (err) {
         res.status(500);
         res.json({ error: "Invalid token", error: err });

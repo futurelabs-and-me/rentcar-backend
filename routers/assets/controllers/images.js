@@ -14,21 +14,17 @@ const checkfileex = (pr_image, fileex, list) => {
 
 module.exports = (req, res) => {
   const { list } = req.query;
-  if (req.headers["content-type"] === "image/png") {
-    fs.readFile(
-      `${process.env.ASSETS_SRC}/images/${req.params.image}${checkfileex(
-        req.params.image,
-        ".png",
-        list
-      )}`,
-      (err, data) => {
-        if (err) {
-          res.status(404).send({ error: "fs error", message: err });
-        }
-        res.end(data);
+  fs.readFile(
+    `${process.env.ASSETS_SRC}/images/${req.params.image}${checkfileex(
+      req.params.image,
+      ".png",
+      list
+    )}`,
+    (err, data) => {
+      if (err) {
+        res.status(404).send({ error: "fs error", message: err });
       }
-    );
-  } else {
-    res.status(404).send({ message: "Not found" });
-  }
+      res.end(data);
+    }
+  );
 };

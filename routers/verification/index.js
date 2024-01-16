@@ -5,9 +5,9 @@ const email_middlewares = [
   require("./middleware/email/verify"),
 ];
 
-router.put("/email/:id", email_middlewares, require("./controllers/email"));
+router.put("/email", email_middlewares, require("./controllers/email"));
 
-router.get("/phone/:id", (rq, rs) => {
+router.get("/phone", (rq, rs) => {
   rs.status(404).send("bad request");
 });
 

@@ -11,7 +11,7 @@ module.exports = (req, res) => {
           car
             .deleteOne({ _id: req.params.id })
             .then((data) => {
-              res.json(data);
+              res.json({ message: "Successful", data });
             })
             .catch((error) => {
               res.json(error);

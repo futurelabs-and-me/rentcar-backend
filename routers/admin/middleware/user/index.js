@@ -1,5 +1,5 @@
-const JWT = require("jsonwebtoken");
 const admin = require("../../../../Schemas/admin/users");
+const JWT = require("jsonwebtoken");
 module.exports = (req, res, next) => {
   if (req.cookies.AdminToken && req.cookies.Adminuser) {
     JWT.verify(
@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
       (err, decoded) => {
         if (err) {
           res.status(500);
-          res.json({ error: "Invalid token", error: err });
+          res.json({ error: err });
         } else {
           admin
             .findById(decoded.id)

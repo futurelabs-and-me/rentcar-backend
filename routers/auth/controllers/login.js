@@ -4,51 +4,44 @@ const { USER_JWT_EXPIRES } = require("../../../config");
 const user = require("../../../Schemas/user");
 
 function gentoken(id) {
-  return JWT.sign({ id }, process.env.SECRET_KEY, {
-    expiresIn: USER_JWT_EXPIRES || "1d",
-  });
+  return JWT.sign({ id }, process.env.SECRET_KEY);
 }
 
 module.exports = async (req, res) => {
-  const { email, password, expiered } = req.body;
+  const { email, password } = req.body;
 
-  if (!email) {
-    res.json({ error: { message: "required", field: "email" } });
+  if (!email && !password) {
+    res.json({
+      error: { message: "required", field: ["email", "password"] },
+    });
+  } else if (!email) {
+    res.json({ error: { message: "required", field: ["email", undefined] } });
   } else if (!password) {
-    res.json({ error: { message: "required", field: "password" } });
+    res.json({
+      error: { message: "required", field: [undefined, "password"] },
+    });
   } else {
-    if (expiered) {
-      user
-        .find({})
-        .then((data) => {
-          data.filter((user) => {
-            if (user.email === email) {
-              bcrypt.compare(password, user.password, (err, result) => {
-                if (result) {
-                  res.json({
-                    auth: "Successful",
-                    data: { ...user._doc, token: gentoken(user._id) },
-                  });
-                }
-                if (err) {
-                  res.json({ auth: "Failed", error: err });
-                }
-              });
-            }
-          });
-        })
-        .catch((err) => {
-          res.json({ error: err });
-        });
-    } else {
-      user.find({}).then((data) => {
+    user
+      .find({})
+      .then((data) => {
         data.filter((user) => {
           if (user.email === email) {
             bcrypt.compare(password, user.password, (err, result) => {
               if (result) {
+                const token = gentoken(user._id);
+                res.cookie("Token", token, {
+                  maxAge: USER_JWT_EXPIRES || 86400000,
+                  httpOnly: true,
+                  secure: true,
+                });
+                res.cookie("user", user._id, {
+                  maxAge: USER_JWT_EXPIRES || 86400000,
+                  httpOnly: true,
+                  secure: true,
+                });
                 res.json({
                   auth: "Successful",
-                  data: { ...user._doc },
+                  data: { ...user._doc, token },
                 });
               }
               if (err) {
@@ -57,7 +50,9 @@ module.exports = async (req, res) => {
             });
           }
         });
+      })
+      .catch((err) => {
+        res.json({ error: err });
       });
-    }
   }
 };

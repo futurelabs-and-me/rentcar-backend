@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const car = require("../../../../Schemas/car");
-const addimage = require("../../functions/addimage");
 
 module.exports = (req, res) => {
   const ID = new mongoose.Types.ObjectId().toHexString();
@@ -22,28 +21,22 @@ module.exports = (req, res) => {
     res.status(400).json({ error: "Image is required" });
   } else {
     location = JSON.parse(location);
-    addimage(img, ID)
-      .then(() => {
-        car
-          .create({
-            _id: ID,
-            name,
-            size,
-            fueltype,
-            mileage,
-            amount,
-            owner_id: req.local.admin.id,
-            location,
-            image: {
-              url: `/assets/images/${ID}`,
-            },
-          })
-          .then((data) => {
-            res.status(200).json(data);
-          })
-          .catch((error) => {
-            res.status(500).json({ error: error.message });
-          });
+    car
+      .create({
+        _id: ID,
+        name,
+        size,
+        fueltype,
+        mileage,
+        amount,
+        owner_id: req.local.admin.id,
+        location,
+        image: {
+          url: `/assets/images/${ID}`,
+        },
+      })
+      .then((data) => {
+        res.status(200).json(data);
       })
       .catch((error) => {
         res.status(500).json({ error: error.message });

@@ -19,6 +19,7 @@ const connection = new Promise((resolve, reject) => {
           resolve();
         });
       });
+
       data.on("error", (err) => {
         reject({ error: err, message: "data DB connection failed" });
       });
@@ -35,10 +36,12 @@ const connection = new Promise((resolve, reject) => {
 
 data.on("disconnected", () => {
   console.log("data DB disconnected");
+  process.exit(1);
 });
 
 admin.on("disconnected", () => {
   console.log("admin DB disconnected");
+  process.exit(1);
 });
 
 process.on("SIGINT", () => {

@@ -1,6 +1,7 @@
 console.clear();
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const DB = require("./config/db");
@@ -14,17 +15,23 @@ const users = require("./routers/users");
 const cars = require("./routers/cars");
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: "50mb" }));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+app.use(cookieParser());
+app.use(express.json());
 
 DB.connection
   .then(() => {
     app.use("/auth", auth);
     app.use("/admin", admin);
-    app.use("/verification", verification);
+    app.use("/verify", verification);
     app.use("/assets", assets);
     app.use("/order", require("./middlewares/orders"), order);
-    app.use("/users", require("./middlewares/users"), users);
+    app.use("/user", require("./middlewares/users"), users);
     app.use("/cars", cars);
     app.listen(process.env.PORT || 5000, () => {
       console.log(`Server running on port ${process.env.PORT || 5000}`);

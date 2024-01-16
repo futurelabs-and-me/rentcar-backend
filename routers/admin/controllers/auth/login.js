@@ -4,58 +4,47 @@ const { USER_JWT_EXPIRES } = require("../../../../config");
 const user = require("../../../../Schemas/admin/users");
 
 function gentoken(id) {
-  return JWT.sign({ id }, process.env.ADMIN_SECRET_KEY, {
-    expiresIn: USER_JWT_EXPIRES || "1d",
-  });
+  return JWT.sign({ id }, process.env.ADMIN_SECRET_KEY);
 }
 
 module.exports = async (req, res) => {
-  const { email, password, expiered } = req.body;
+  const { email, password } = req.body;
 
   if (!email) {
     res.json({ error: { message: "required", field: "email" } });
   } else if (!password) {
     res.json({ error: { message: "required", field: "password" } });
   } else {
-    if (expiered) {
-      user
-        .find({})
-        .then((data) => {
-          data.filter((user) => {
-            if (user.email === email) {
-              bcrypt.compare(password, user.password, (err, result) => {
-                if (result) {
-                  res.json({
-                    auth: "Successful",
-                    data: { ...user._doc, token: gentoken(user._id) },
-                  });
-                } else if (err) {
-                  res.json({ auth: "Failed", error: err });
-                }
-              });
-            }
-          });
-        })
-        .catch((err) => {
-          res.json({ error: err });
-        });
-    } else {
-      user.find({}).then((data) => {
-        data.filter((user) => {
-          if (user.email === email) {
-            bcrypt.compare(password, user.password, (err, result) => {
-              if (result) {
-                res.json({
-                  auth: "Successful",
-                  data: { ...user._doc },
-                });
-              } else if (err) {
-                res.json({ auth: "Failed", error: err });
-              }
+    user
+      .findOne({ email: email })
+      .then((user) => {
+        bcrypt.compare(password, user.password, (err, result) => {
+          if (result) {
+            console.log(user);
+            const token = gentoken(user._id);
+            res.cookie("AdminToken", token, {
+              maxAge: USER_JWT_EXPIRES || 86400000,
+              httpOnly: true,
+              secure: true,
             });
+            res.cookie("Adminuser", user._id, {
+              maxAge: USER_JWT_EXPIRES || 86400000,
+              httpOnly: true,
+              secure: true,
+            });
+            res.json({
+              auth: "Successful",
+              data: { ...user._doc, token },
+            });
+          } else if (err) {
+            res.json({ auth: "Failed", error: err });
+          } else {
+            res.json({ auth: "Failed", password: "Incorrect password" });
           }
         });
+      })
+      .catch((err) => {
+        res.json({ error: err });
       });
-    }
   }
 };
